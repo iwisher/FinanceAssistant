@@ -12,3 +12,7 @@ core/pb/LICENSE.md
 core/pb/pocketbase
 core/work_dir/
 /work_dir
+*.mp3
+*.wav
+*.m4a
+*.mp4

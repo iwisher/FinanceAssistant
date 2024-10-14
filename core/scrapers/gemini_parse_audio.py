@@ -51,6 +51,6 @@ response = chat_session .send_message(["Please summerize this audio as instructe
 
 print(response.text)
 
-response = chat_session.send_message(["Generate audio diarization for this interview. If you can infer the speaker, please do. If not, use speaker A, speaker B, etc",files[0]])
+response = chat_session.send_message(["Generate transcript for this interview. If you can infer the speaker, please do. If not, use speaker A, speaker B, etc",files[0]])
 
 print(response.text)
