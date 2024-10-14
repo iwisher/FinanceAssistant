@@ -1,0 +1,10 @@
+2024-09-29 20:36:16.163 | INFO     | __main__:youtube_crawler:34 - name 'header' is not defined
+waiting 1min
+2024-09-29 20:43:14.987 | INFO     | __main__:youtube_crawler:52 - object str can't be used in 'await' expression
+waiting 1min
+2024-09-29 20:43:24.046 | INFO     | __main__:youtube_crawler:52 - object str can't be used in 'await' expression
+waiting 1min
+2024-09-29 20:44:17.822 | WARNING  | __main__:youtube_crawler:55 - object str can't be used in 'await' expression
+2024-09-29 21:07:24.941 | INFO     | __main__:youtube_crawler:47 - object str can't be used in 'await' expression
+waiting 1min
+2024-09-29 21:08:27.696 | WARNING  | __main__:youtube_crawler:50 - object str can't be used in 'await' expression

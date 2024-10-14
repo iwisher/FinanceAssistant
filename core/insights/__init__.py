@@ -54,6 +54,9 @@ async def pipeline(url: str, cache: Dict[str, str] = {}):
         for k, v in cache.items():
             if v:
                 result[k] = v
+                
+        # TODO handel flag 13 and use Gemini webdrive to parse the youtube video
+        # TODO also check the expiration date of the video
 
         # get info process
         logger.debug(f"article: {result['title']}")
