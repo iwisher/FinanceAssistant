@@ -201,6 +201,21 @@ def download_youtube_audio(url, title=None, output_path=None):
             print(f"An error occurred: {str(e)}")
             return None
 
+def extract_youtube_handle(url):
+    """
+    Extracts the YouTube handle from a given URL.
+
+    Args:
+        url: The YouTube URL.
+
+    Returns:
+        The YouTube handle, or None if not found.
+    """
+    match = re.search(r"@([a-zA-Z0-9_]+)", url)
+    if match:
+        return match.group(1)
+    return None
+    
 if __name__ == '__main__':
     logger.add(
         'wiseflow.log',
@@ -210,7 +225,8 @@ if __name__ == '__main__':
         rotation="50 MB"
     )
     #url = "https://www.youtube.com/@NaNaShuoMeiGu/videos"
-    url = "https://www.youtube.com/@allin/videos"
+    #url = "https://www.youtube.com/@allin/videos"
+    url = "https://www.youtube.com/@ltshijie/videos"
     # res = fetch_with_selenium(url)
     # print(res)
     # bo = BeautifulSoup(res, 'html.parser')
@@ -221,7 +237,9 @@ if __name__ == '__main__':
         result = await youtube_crawler(url, logger)
         print(result)
         print(result[1]['url'])
-        file= download_youtube_audio(result[1]['url'], result[1]['title'],'./download/')
+        print(result[1]['title'])
+        title = extract_youtube_handle(url) +"-" + datetime.now().strftime("%Y%m%d-%H%M")
+        file= download_youtube_audio(result[1]['url'], title,'./download/')
         print(f'Download file path {file}') 
 
     asyncio.run(main())
