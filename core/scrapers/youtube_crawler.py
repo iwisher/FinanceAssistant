@@ -239,7 +239,7 @@ if __name__ == '__main__':
         print(result[1]['url'])
         print(result[1]['title'])
         title = extract_youtube_handle(url) +"-" + datetime.now().strftime("%Y%m%d-%H%M")
-        file= download_youtube_audio(result[1]['url'], title,'./download/')
+        file= download_youtube_audio(result[1]['url'], title,'./download')
         print(f'Download file path {file}') 
 
     asyncio.run(main())
