@@ -3,7 +3,8 @@
 from typing import Union
 import httpx
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import pytz
 import re
 import asyncio
 from loguru import logger
@@ -101,9 +102,9 @@ def download_podcast(url, title=None, output_path=None):
     title = normalize_title(title) if title is not None else generate_random_filename()
     ydl_opts = {
             'format': 'bestaudio/best',
-            'writethumbnail': True,
-            'writesubtitles': True,
-            'writedescription': True,
+            'writethumbnail': False,
+            'writesubtitles': False,
+            'writedescription': False,
             'outtmpl':f'{title}.%(ext)s' if output_path is None else f'{output_path}/{title}.%(ext)s',
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -121,6 +122,9 @@ def download_podcast(url, title=None, output_path=None):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             try:
                 info = ydl.extract_info(url, download=True)
+                publish_date = datetime.fromtimestamp(info['timestamp'],tz= pytz.timezone('America/Los_Angeles'))
+                #.strftime('%Y-%m-%d %H:%M:%S'
+                print(f'{publish_date}')
                 audio_title = normalize_title(info['title'])
                 print(f"Successfully downloaded: {audio_title}")
                 return f'{title}.mp3' if output_path is None else f'{output_path}/{title}.mp3'
