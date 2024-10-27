@@ -78,6 +78,6 @@ def gemini_chat(file_path, history=[]):
   return response_summary.text, transcript
 
 if __name__ == '__main__':
-   summary,transcript = gemini_chat("./download/ltshijie-20241015-2136.mp3")
+   summary,transcript = gemini_chat("./download/bloomberg_Vmowvs3U1.mp3")
    print(summary)
    print(transcript)
