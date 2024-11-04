@@ -16,4 +16,5 @@ core/work_dir/
 *.wav
 *.m4a
 *.mp4
+*.txt
 wiseflow.log

@@ -61,7 +61,7 @@ def gemini_chat(file_path, history=[], chunk_length_ms=900000): # Added chunk_le
     try:
       files = [upload_to_gemini(chunk_path, mime_type="audio/mpeg")]
       chat_session = model.start_chat(history=history)
-      response = chat_session.send_message(["Provide a transcript of this audio.", files[0]])
+      response = chat_session.send_message(["Provide a transcript of this audio. If there are multiple speakers, please generate audio diarization for this audio. If you can infer the speaker, please do. If not, use speaker A, speaker B, etc", files[0]])
       full_transcript += response.text.strip() + " "
       os.remove(chunk_path) # Clean up temporary files
     except Exception as e:
@@ -72,5 +72,8 @@ def gemini_chat(file_path, history=[], chunk_length_ms=900000): # Added chunk_le
 
 
 if __name__ == '__main__':
-   transcript = gemini_chat("./download/ltshijie-20241102-1521.mp3")
+   transcript = gemini_chat("./download/NaNaShuoMeiGu-20241103-2055.mp3")
    print(transcript)
+   with open("./download/NaNaShuoMeiGu-20241103-2055.txt", "w") as f:
+      f.write(transcript)
+      f.close()

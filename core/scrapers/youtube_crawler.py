@@ -224,9 +224,11 @@ if __name__ == '__main__':
         diagnose=True,
         rotation="50 MB"
     )
-    #url = "https://www.youtube.com/@NaNaShuoMeiGu/videos"
+    url = "https://www.youtube.com/@NaNaShuoMeiGu/videos"
+    #url = "https://www.youtube.com/@MeiTouNews/videos"
+    #url = "https://www.youtube.com/@SUNNYFINANCE/videos"
     #url = "https://www.youtube.com/@allin/videos"
-    url = "https://www.youtube.com/@ltshijie/videos"
+    #url = "https://www.youtube.com/@ltshijie/videos"
     # res = fetch_with_selenium(url)
     # print(res)
     # bo = BeautifulSoup(res, 'html.parser')

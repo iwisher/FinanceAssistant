@@ -1,0 +1,41 @@
+read_news_task:
+  description: >
+    Conduct a thorough reading with the material from input director.
+    Group and summarize economics, politic policy, stock market and company news, 
+    and influencing factors. Ensure the summary is clear, complete, objective, and 
+    easy to understand. The summary should include key factors mentioned in the 
+    input materials, such as specific index values (e.g., Dow Jones closing at 34,000), 
+    percentage changes in stock prices or indexes, interest rates, economic growth 
+    figures, and unemployment numbers.
+  expected_output: >
+    Structure the summary logically, starting with an overview of the market, 
+    followed by economic indicators, influencing factors, and finally, company-specific news.
+    Formatted as markdown without '```'
+  agent: news_analyst
+
+economic_analyze_task:
+  description: >
+    Review the context you got and expand the each related economic or market topic 
+    into a full section for a report. Make sure the report is detailed and contains 
+    any and all relevant information. Provide insights into the impact of geopolitical 
+    events on specific sectors and companies.
+  expected_output: >
+    A fully fledge reports with insights and alerts about significant market 
+    opportunities or threats, summerize the postive or negtive impact to us 
+    stock market and give a scale from [0-5]
+    Formatted as markdown without '```'
+  agent: economist
+
+
+political_analyze_task:
+  description: >
+    Review the context you got and expand the each related politic policy or 
+    geopolitical market topic into a full section for a report. Make sure the 
+    report is detailed and contains any and all relevant information. Provide 
+    insights into the impact of  events on specific sectors and companies.
+  expected_output: >
+    A fully fledge reports with insights and alerts about significant market 
+    opportunities or threats, summerize the postive or negtive impact to us 
+    stock market and give a scale from [0-5]
+    Formatted as markdown without '```'
+  agent: political_analyst
