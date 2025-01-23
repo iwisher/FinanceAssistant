@@ -23,7 +23,7 @@ from utils import extract_video_info
 # @TODO Read chrome profile from env variable 
 def fetch_with_selenium(url):
     # TODO remove the default value before checkin
-    user_profile = os.environ.get('CHROME_USER_PROFILE','/home/rsong/.var/app/com.google.Chrome/config/google-chrome/Default')
+    user_profile = os.environ.get('CHROME_USER_PROFILE','/home/rongsong/.config/google-chrome/Default') #'/home/rsong/.var/app/com.google.Chrome/config/google-chrome/Default')
     options = Options()
     options.add_argument(f"user-data-dir={user_profile}")
     options.add_argument('--headless=new')  # Use '--headless' for older Chrome versions
@@ -224,7 +224,8 @@ if __name__ == '__main__':
         diagnose=True,
         rotation="50 MB"
     )
-    url = "https://www.youtube.com/@NaNaShuoMeiGu/videos"
+    url =  "https://www.youtube.com/@ARKInvest2015/videos"
+    # url = "https://www.youtube.com/@NaNaShuoMeiGu/videos"
     #url = "https://www.youtube.com/@MeiTouNews/videos"
     #url = "https://www.youtube.com/@SUNNYFINANCE/videos"
     #url = "https://www.youtube.com/@allin/videos"

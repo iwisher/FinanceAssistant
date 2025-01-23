@@ -10,7 +10,7 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import pydub
 from pydub import AudioSegment
 
-genai.configure(api_key=os.environ["GEMINI_API_KEY"])
+genai.configure(api_key="AIzaSyCpfu_np4C2yTYv4yLzKl5zCt0qGuO-7a4")#os.environ["GEMINI_API_KEY"])
 
 def upload_to_gemini(path, mime_type=None):
   """Uploads the given file to Gemini.
@@ -41,10 +41,10 @@ def gemini_chat(file_path, history=[], chunk_length_ms=900000): # Added chunk_le
   
 
   model = genai.GenerativeModel(
-    model_name="gemini-1.5-flash-002",
+    model_name="gemini-2.0-flash-exp",
     generation_config=generation_config,
     safety_settings=safetty_settings,
-    system_instruction="You help generate transcript from input files. Please generate transcript verbitemly and accurately.",
+    system_instruction="You help generate transcript from input files. Please generate transcript verbatimly and accurately.",
     #system_instruction= "Purpose and Goals:\n\nListen to financial news audio and extract relevant information.\nSummarize key stock market and economics changes, and influencing factors.\nProvide details on company-specific news, such as earnings reports and major announcements.\nEnsure the summary is clear, concise, objective, and easy to understand.\nThe summary should include key metric values and key data, such as specific index values (e.g., Dow Jones closing at 34,000), percentage changes in stock prices or indexes, interest rates, economic growth figures, and unemployment numbers.\nBehaviors and Rules:\n\nAudio Analysis:\na) Carefully listen to the provided financial news audio.\nb) Pay close attention to quantitative data and any mentions of the Nasdaq Composite, S&P 500, and key economic indicators.\n\nInformation Extraction:\na) Identify and summarize the key stock market and ecomoncis changes, including percentage changes and specific index values.\nb) Summarize key economic indicator changes and their potential impact on the market.\nc) Identify any influencing factors, such as government policies or global events, that are mentioned in the audio.\nd) Gather relevant information on company-specific news, including earnings reports, major announcements (mergers, acquisitions, new products), and significant price movements.\ne) Note the reasons for any company-specific changes or price movements.\n\nSummary Generation:\na) Present the extracted information in a clear and concise manner.\nb) Use a neutral tone in your own summary. If analysts or experts in the audio express opinions or predictions, clearly attribute those statements.\nc) Structure the summary logically, starting with an overview of the market, followed by economic indicators, influencing factors, and finally, company-specific news.\nd) Use bullet points or other formatting tools to enhance readability.\ne) Ensure the summary is easy to understand, even for someone with limited financial knowledge.\nf) In addition to summarizing the news, highlight any key insights or analysis offered in the audio, such as expert interpretations of market trends or potential investment implications.\n\nOverall Tone:\n\nBe informative, objective, and accurate in your summary.\nUse professional and clear language.\nFocus on providing a concise and comprehensive overview of the financial news audio.",
   )
 
@@ -72,8 +72,8 @@ def gemini_chat(file_path, history=[], chunk_length_ms=900000): # Added chunk_le
 
 
 if __name__ == '__main__':
-   transcript = gemini_chat("./download/NaNaShuoMeiGu-20241103-2055.mp3")
+   transcript = gemini_chat("./download/De-FAANG'd ｜ ITK with Cathie Wood.mp3")
    print(transcript)
-   with open("./download/NaNaShuoMeiGu-20241103-2055.txt", "w") as f:
+   with open("./download/ARKInvest2015-20250112-1430.txt", "w") as f:
       f.write(transcript)
       f.close()
