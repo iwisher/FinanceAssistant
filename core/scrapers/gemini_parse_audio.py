@@ -72,7 +72,8 @@ def gemini_chat(file_path, history=[], chunk_length_ms=900000): # Added chunk_le
 
 
 if __name__ == '__main__':
-   transcript = gemini_chat("./download/De-FAANG'd ｜ ITK with Cathie Wood.mp3")
+   transcript = gemini_chat('./download/"Gilt Trip" | ITK with Cathie Wood.mp3')
+   #'./download/＂Gilt Trip＂ ｜ ITK with Cathie Wood.mp3'
    print(transcript)
    with open("./download/ARKInvest2015-20250112-1430.txt", "w") as f:
       f.write(transcript)

@@ -33,8 +33,10 @@ def create_connection():
 
 
 """ Create a table to store youtube download logs """
-
-
+"""
+    SELECT id, json_extract(metadata, '$.title') as title
+    FROM content_downloads cd 
+"""
 def create_table(conn):
     try:
         cursor = conn.cursor()
@@ -46,7 +48,7 @@ def create_table(conn):
                 audio_file_path TEXT,
                 transcript_file_path TEXT,
                 transcript_text TEXT,
-                metadata TEXT,
+                metadata JSON,
                 download_time DATETIME DEFAULT CURRENT_TIMESTAMP
             )
         """)
@@ -57,14 +59,12 @@ def create_table(conn):
 
 
 """ Save the youtube download log to the database """
-
-
 def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data):
     try:
         cursor = conn.cursor()
         cursor.execute("""
-            INSERT INTO youtube_downloads (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text)
-            VALUES (?, ?, ?, ?, ?,?)
+            INSERT INTO content_downloads (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, metadata)
+            VALUES (?, ?, ?, ?, ?, ?)
         """, (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data))
         conn.commit()
         logger.info(f"Successfully saved download log for video: {video_url}")
@@ -73,8 +73,6 @@ def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_
 
 
 """ Download youtube video, generate transcript and save log to database """
-
-
 async def download_playlist(playlist_url, download_dir='./download'):
 
     # use yt_dlp to download playlist's new vidoe, https://www.youtube.com/playlist?list=PL4i4RQ_PMSj6hx81G5R1in4M9oc7Iwqgb
@@ -88,7 +86,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
         ydl_opts = {
             'noplaylist': False,
             'download_archive': os.path.join(download_dir, 'download_archive.log'),
-            'outtmpl': os.path.join(download_dir, '%(title)s.%(ext)s'),
+            'outtmpl': os.path.join(download_dir, '%(id)s.%(ext)s'),
             'format': 'bestaudio/best',
             'embedthumbnail': True,
             'postprocessors': [{
@@ -121,6 +119,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
                         logger.info(f"Video Channel ID: {entry['channel_id']}")
                         
                         metadata = {
+                            "id": entry['id'],
                             "title": entry['title'],
                             "tags":str(entry['tags']),
                             "categories": str(entry['categories']),
@@ -130,12 +129,16 @@ async def download_playlist(playlist_url, download_dir='./download'):
 
                         json_string = json.dumps(metadata, indent=4)
 
-                        audio_file_path = os.path.join(download_dir, f"{entry['title']}.mp3"),
+                        audio_file_path = os.path.join(download_dir, f"{entry['id']}.mp3")
 
                         transcript = gemini_chat(audio_file_path)
 
                         transcript_file_path = os.path.join(
-                            download_dir, f"{entry['title']}.txt")
+                            download_dir, f"{entry['id']}.txt")
+                        
+                        with open(transcript_file_path, "w") as f:
+                            f.write(transcript)
+                            f.close()
 
                         save_download_log(
                             conn, playlist_url, entry['webpage_url'], audio_file_path, transcript_file_path, transcript, json_string)
