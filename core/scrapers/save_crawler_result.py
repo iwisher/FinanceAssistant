@@ -103,7 +103,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
             'noplaylist': False,
             'download_archive': os.path.join(download_dir, 'download_archive.log'),
             'outtmpl': os.path.join(download_dir, '%(id)s.%(ext)s'),
-            'format': 'bestaudio/best',
+            'format': 'bestaudio/best[acodec=mp3]',
             'embedthumbnail': True,
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
@@ -156,7 +156,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
                             download_dir, f"{entry['id']}.mp3")
 
                         # transcript = gemini_chat(audio_file_path)
-                        transcript = whsiper_model.transcribe()['text']
+                        transcript = whsiper_model.transcribe(audio_file_path)['text']
 
                         transcript_file_path = os.path.join(
                             download_dir, f"{entry['id']}.txt")
