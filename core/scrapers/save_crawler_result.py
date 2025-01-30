@@ -7,14 +7,16 @@ from loguru import logger
 from gemini_parse_audio import gemini_chat
 from youtube_crawler import download_youtube_audio, extract_youtube_handle, youtube_crawler
 import json
+import whisper
+import torch
 
 # Configure logger
 logger.add(
-    "youtube_transcript_crawler.log",
+    "crawler.log",
     level="DEBUG",
     backtrace=True,
     diagnose=True,
-    rotation="50 MB",
+    rotation="10 MB",
 )
 
 
@@ -37,6 +39,8 @@ def create_connection():
     SELECT id, json_extract(metadata, '$.title') as title
     FROM content_downloads cd 
 """
+
+
 def create_table(conn):
     try:
         cursor = conn.cursor()
@@ -59,6 +63,8 @@ def create_table(conn):
 
 
 """ Save the youtube download log to the database """
+
+
 def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data):
     try:
         cursor = conn.cursor()
@@ -73,6 +79,8 @@ def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_
 
 
 """ Download youtube video, generate transcript and save log to database """
+
+
 async def download_playlist(playlist_url, download_dir='./download'):
 
     # use yt_dlp to download playlist's new vidoe, https://www.youtube.com/playlist?list=PL4i4RQ_PMSj6hx81G5R1in4M9oc7Iwqgb
@@ -81,6 +89,14 @@ async def download_playlist(playlist_url, download_dir='./download'):
     if not conn:
         return
     create_table(conn)
+
+    # load whisper model
+    # You can choose different models like "small", "medium", "large" for different accuracy/speed tradeoffs
+    device = torch.device(
+        'cuda') if torch.cuda.is_available() else torch.device('cpu')
+    whsiper_model = whisper.load_model("base", device=device)
+    print("Whisper model loaded.")
+
     try:
         timestamp = datetime.now().strftime("%Y%m%d-%H%M")
         ydl_opts = {
@@ -106,10 +122,14 @@ async def download_playlist(playlist_url, download_dir='./download'):
 
                 for i, entry in enumerate(entries):
                     try:
+                        if entry is None:
+                            continue
+
                         logger.info(
                             f"Downloading video {i+1} of {total_videos}: {entry['title']}")
                         # Download each video individually
-                        d_info = ydl.download([entry['webpage_url']])
+                        d_info = ydl.extract_info(
+                            entry['webpage_url'], download=True)
                         # entry['title']
                         logger.info(f"Downloaded Title: {entry['title']}")
                         logger.info(f"Video Tags: {entry['tags']}")
@@ -117,25 +137,30 @@ async def download_playlist(playlist_url, download_dir='./download'):
                         logger.info(
                             f"Video Descriptions: {entry['description']}")
                         logger.info(f"Video Channel ID: {entry['channel_id']}")
-                        
+
                         metadata = {
                             "id": entry['id'],
                             "title": entry['title'],
-                            "tags":str(entry['tags']),
+                            "tags": str(entry['tags']),
                             "categories": str(entry['categories']),
                             "descriptions": str(entry['description']),
                             "channel_id": entry['channel_id'],
                         }
 
-                        json_string = json.dumps(metadata, indent=4)
+                        # json_string = json.dumps(metadata, indent=4)
 
-                        audio_file_path = os.path.join(download_dir, f"{entry['id']}.mp3")
+                        json_string = json.dumps(
+                            ydl.sanitize_info(d_info), indent=3)
 
-                        transcript = gemini_chat(audio_file_path)
+                        audio_file_path = os.path.join(
+                            download_dir, f"{entry['id']}.mp3")
+
+                        # transcript = gemini_chat(audio_file_path)
+                        transcript = whsiper_model.transcribe()['text']
 
                         transcript_file_path = os.path.join(
                             download_dir, f"{entry['id']}.txt")
-                        
+
                         with open(transcript_file_path, "w") as f:
                             f.write(transcript)
                             f.close()
