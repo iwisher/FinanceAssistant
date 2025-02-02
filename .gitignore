@@ -16,7 +16,6 @@ core/work_dir/
 *.wav
 *.m4a
 *.mp4
-db/*.db
 download/download_archive.log
 youtube_downloads.db
 youtube_transcript_crawler.log
