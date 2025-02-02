@@ -24,12 +24,12 @@ import random
 import string
 from gemini_parse_audio import gemini_chat
 from save_crawler_result import save_download_log, create_connection
-from utils import extract_video_info
+from core.utils.utils import extract_video_info
 
 
 # Configure logger
 logger.add(
-    "crawler.log",
+    "log/crawler.log",
     level="DEBUG",
     backtrace=True,
     diagnose=True,
@@ -159,7 +159,7 @@ async def download_podcast(url, download_dir='./download'):
         # You can choose different models like "small", "medium", "large" for different accuracy/speed tradeoffs
         device = torch.device(
             'cuda') if torch.cuda.is_available() else torch.device('cpu')
-        whsiper_model = whisper.load_model("base", device=device)
+        whsiper_model = whisper.load_model("turbo", device=device)
         print("Whisper model loaded.")
 
         for i, entry in enumerate(entries):

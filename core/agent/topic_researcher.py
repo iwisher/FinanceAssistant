@@ -3,8 +3,8 @@ from crewai_tools import SerperDevTool
 import os
 
 #gemini/gemini-2.0-flash-exp
-llm = LLM(model="gemini/gemini-2.0-flash-thinking-exp-1219", temperature=0.7,api_key="AIzaSyCpfu_np4C2yTYv4yLzKl5zCt0qGuO-7a4")
-#llm = LLM(model="gpt-4o-mini", temperature=0.7,api_key="AIzaSyCpfu_np4C2yTYv4yLzKl5zCt0qGuO-7a4")
+llm = LLM(model="gemini/gemini-2.0-flash-thinking-exp-1219", temperature=0.7,api_key=os.environ["GEMINI_API_KEY"])
+#llm = LLM(model="gpt-4o-mini", temperature=0.7,api_key="")
 
 # Agent defination
 researcher = Agent(

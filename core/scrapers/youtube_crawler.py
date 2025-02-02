@@ -18,7 +18,7 @@ import yt_dlp
 import unicodedata
 import random
 import string
-from utils import extract_video_info
+from core.utils.utils import extract_video_info
 
 # @TODO Read chrome profile from env variable 
 def fetch_with_selenium(url):

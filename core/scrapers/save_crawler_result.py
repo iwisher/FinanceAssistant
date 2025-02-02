@@ -4,81 +4,21 @@ import os
 from datetime import datetime
 import yt_dlp
 from loguru import logger
-from gemini_parse_audio import gemini_chat
 from youtube_crawler import download_youtube_audio, extract_youtube_handle, youtube_crawler
 import json
 import whisper
 import torch
+from core.utils.db import create_connection, create_table , save_download_log
 
 # Configure logger
 logger.add(
-    "crawler.log",
+    "log/crawler.log",
     level="DEBUG",
     backtrace=True,
     diagnose=True,
     rotation="10 MB",
 )
 
-
-def create_connection():
-    """ Create a database connection to a SQLite database """
-    conn = None
-    try:
-        conn = sqlite3.connect('db/downloads.db')
-        logger.info(f"Successfully connected to database: db/downloads.db")
-        return conn
-    except sqlite3.Error as e:
-        logger.error(f"Error connecting to database: {e}")
-        if conn:
-            conn.close()
-        return None
-
-
-""" Create a table to store youtube download logs """
-"""
-    SELECT id, json_extract(metadata, '$.title') as title
-    FROM content_downloads cd 
-"""
-
-
-def create_table(conn):
-    try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS content_downloads (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                channel_url TEXT,
-                video_url TEXT,
-                audio_file_path TEXT,
-                transcript_file_path TEXT,
-                transcript_text TEXT,
-                metadata JSON,
-                download_time DATETIME DEFAULT CURRENT_TIMESTAMP
-            )
-        """)
-        conn.commit()
-        logger.info("Successfully created table: youtube_downloads")
-    except sqlite3.Error as e:
-        logger.error(f"Error creating table: {e}")
-
-
-""" Save the youtube download log to the database """
-
-
-def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data):
-    try:
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO content_downloads (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, metadata)
-            VALUES (?, ?, ?, ?, ?, ?)
-        """, (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data))
-        conn.commit()
-        logger.info(f"Successfully saved download log for video: {video_url}")
-    except sqlite3.Error as e:
-        logger.error(f"Error saving download log: {e}")
-
-
-""" Download youtube video, generate transcript and save log to database """
 
 
 async def download_playlist(playlist_url, download_dir='./download'):
@@ -94,7 +34,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
     # You can choose different models like "small", "medium", "large" for different accuracy/speed tradeoffs
     device = torch.device(
         'cuda') if torch.cuda.is_available() else torch.device('cpu')
-    whsiper_model = whisper.load_model("base", device=device)
+    whsiper_model = whisper.load_model("turbo", device=device)
     print("Whisper model loaded.")
 
     try:
@@ -192,6 +132,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
 
 if __name__ == '__main__':
     async def main():
-        url = "https://www.youtube.com/playlist?list=PL4i4RQ_PMSj6hx81G5R1in4M9oc7Iwqgb"
+        #url = "https://www.youtube.com/playlist?list=PL4i4RQ_PMSj6hx81G5R1in4M9oc7Iwqgb"
+        url = "https://www.youtube.com/@MeiTouJun/videos"
         await download_playlist(url)
     asyncio.run(main())

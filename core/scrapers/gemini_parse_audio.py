@@ -10,7 +10,7 @@ from google.generativeai.types import HarmCategory, HarmBlockThreshold
 import pydub
 from pydub import AudioSegment
 
-genai.configure(api_key="AIzaSyCpfu_np4C2yTYv4yLzKl5zCt0qGuO-7a4")#os.environ["GEMINI_API_KEY"])
+genai.configure(api_key=os.environ["GEMINI_API_KEY"])
 
 def upload_to_gemini(path, mime_type=None):
   """Uploads the given file to Gemini.

@@ -25,4 +25,5 @@ download/*.webm
 *.log
 wiseflow.log
 crawler.log
-download/*.webm.part
+download/*
+log/*
