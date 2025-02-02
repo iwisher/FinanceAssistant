@@ -57,7 +57,7 @@ if __name__ == '__main__':
             file.write(transcript)
             file.close()
 
-        update_transcript(conn, entry['upload_time'], transcript, entry['id'])
+        update_transcript(conn, entry['id'], transcript, entry['upload_time'])
 
     """
     audios= [
