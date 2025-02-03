@@ -130,6 +130,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
 if __name__ == '__main__':
     async def main():
         #url = "https://www.youtube.com/playlist?list=PL4i4RQ_PMSj6hx81G5R1in4M9oc7Iwqgb"
-        url = "https://www.youtube.com/@MeiTouJun/videos"
+        #url = "https://www.youtube.com/@MeiTouJun/videos"
+        url = "https://www.youtube.com/@MeiTouNews/videos"
         await download_playlist(url)
     asyncio.run(main())

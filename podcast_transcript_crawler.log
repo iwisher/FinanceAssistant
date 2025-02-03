@@ -1,3 +1,0 @@
-2025-01-25 21:43:57.868 | INFO     | __main__:create_connection:32 - Successfully connected to database: db/downloads.db
-2025-01-25 21:43:57.869 | ERROR    | __main__:create_table:68 - Error creating table: unrecognized token: "#"
-2025-01-25 21:43:59.627 | ERROR    | __main__:download_podcast_and_save_transcript:199 - An unexpected error occurred while downloading podcast from https://podcasts.apple.com/us/podcast/bloomberg-surveillance/id296237493: [Errno 2] No such file or directory: './download/ws0rZJLKa.mp3'
