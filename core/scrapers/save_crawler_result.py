@@ -101,7 +101,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
                         transcript_file_path = os.path.join(
                             download_dir, f"{entry['id']}.txt")
 
-                        with open(transcript_file_path, "w") as f:
+                        with open(file=transcript_file_path, mode="w", encoding="UTF-8") as f:
                             f.write(transcript)
                             f.close()
 

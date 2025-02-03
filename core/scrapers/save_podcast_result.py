@@ -16,7 +16,7 @@ import pytz  # Import pytz for timezone handling
 
 # Configure logger
 logger.add(
-    "podcast_transcript_crawler.log",  # Changed log file name
+    "log/podcast_transcript_crawler.log",  # Changed log file name
     level="DEBUG",
     backtrace=True,
     diagnose=True,

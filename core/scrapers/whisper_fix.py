@@ -1,12 +1,15 @@
 from datetime import datetime
 import torch
 import whisper
+from pathlib import Path
+import os
 
 import sys
-PROJECT_ROOT = "/models/DevSpace/FinanceAssistant"
+PROJECT_ROOT = "d:/iwisher/DevSpace/FinanceAssistant"
 sys.path.insert(0, PROJECT_ROOT)
 
 from core.utils.db import create_connection, create_table, run_fetch, update_table
+
 
 # turbo is the bestter balance between speed and accuracy
 device = torch.device(
@@ -17,6 +20,8 @@ print("Whisper model loaded.")
 
 def test_whisper_functionality(url):
 
+    url = os.path.abspath(url)
+    print(url)
     start = datetime.now()
     transcript = whsiper_model.transcribe(url)['text']
     duration = datetime.now() - start
@@ -28,12 +33,10 @@ def update_transcript(conn, id, transcript, upload_datatime):
     sql = """
         UPDATE content_downloads 
         set download_time = STRFTIME('%Y-%m-%d %H:%M:%S', ?)
-        and transcript_text = ?
+        , transcript_text = ?
         where id = ?
     """
-    update_table(conn, sql, (upload_datatime,transcript,id))
-
-
+    update_table(conn, sql, (upload_datatime, transcript, id))
 
 
 if __name__ == '__main__':
@@ -48,12 +51,12 @@ if __name__ == '__main__':
         content_downloads cd
     where
         channel_url = ? """
-    rows = run_fetch(conn,sql , ("https://www.youtube.com/@MeiTouJun/videos",))
+    rows = run_fetch(conn, sql, ("https://www.youtube.com/@MeiTouJun/videos",))
 
     for entry in rows:
         transcript = test_whisper_functionality(entry['audio_file_path'])
 
-        with open(entry['transcript_file_path'],'w') as file:
+        with open(file=os.path.abspath(entry['transcript_file_path']), mode='w', encoding='utf-8') as file:
             file.write(transcript)
             file.close()
 
