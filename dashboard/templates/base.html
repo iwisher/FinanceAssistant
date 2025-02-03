@@ -1,0 +1,70 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen">
+    <nav class="bg-gray-800 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold">Content Manager</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="px-3 py-2 rounded-md hover:bg-gray-700">Add Channels</a>
+                    <a href="/downloads" class="px-3 py-2 rounded-md hover:bg-gray-700">Downloads</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script>
+        // Universal error handler
+        function handleError(error) {
+            console.error('Error:', error);
+            alert(`Error: ${error.message || 'Something went wrong'}`);
+        }
+
+        // Form submission handler
+        function setupFormSubmit(formSelector, endpoint) {
+            const form = document.querySelector(formSelector);
+            if (!form) return;
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                
+                try {
+                    const response = await fetch(endpoint, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            channel_url: formData.get('channel_url'),
+                            channel_type: formData.get('channel_type')
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        const error = await response.json();
+                        throw new Error(error.detail || 'Failed to submit form');
+                    }
+
+                    window.location.href = '/';
+                } catch (error) {
+                    handleError(error);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

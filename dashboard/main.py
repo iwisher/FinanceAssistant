@@ -1,59 +1,91 @@
-from fastapi import FastAPI
+# main.py
+from fastapi import FastAPI, Request, Depends, Form, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
-from __init__ import BackendService
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import HTTPException
+import sqlite3
+from datetime import datetime
+from typing import List, Optional
 
+# Initialize FastAPI
+import os, sys
+#sys.path.insert(0, os.path.abspath("./"))
 
-class InvalidInputException(HTTPException):
-    def __init__(self, detail: str):
-        super().__init__(status_code=442, detail=detail)
+for p in sys.path:
+    print(p)
 
+app = FastAPI()
+app.mount("/static", StaticFiles(directory="./dashboard/static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
-class TranslateRequest(BaseModel):
-    article_ids: list[str]
+# Database setup
+def get_db():
+    with sqlite3.connect('db/downloads.db') as conn:
+        conn.row_factory = sqlite3.Row
+        yield conn
 
+# Create tables on startup
+@app.on_event("startup")
+def startup():
+    with sqlite3.connect('db/downloads.db') as conn:
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS channels (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                channel_url TEXT NOT NULL,
+                channel_type TEXT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            )
+        ''')
+        conn.commit()
 
-class ReportRequest(BaseModel):
-    insight_id: str
-    toc: list[str] = [""]  # The first element is a headline, and the rest are paragraph headings. The first element must exist, can be a null character, and llm will automatically make headings.
-    comment: str = ""
+# Pydantic models
+class ChannelCreate(BaseModel):
+    channel_url: str
+    channel_type: str
 
+# Routes
+@app.get("/", response_class=HTMLResponse)
+async def index(request: Request):
+    return templates.TemplateResponse("add_channel.html", {"request": request})
 
-app = FastAPI(
-    title="wiseflow Backend Server",
-    description="From WiseFlow Team.",
-    version="0.2",
-    openapi_url="/openapi.json"
-)
+@app.get("/downloads", response_class=HTMLResponse)
+async def show_downloads(
+    request: Request,
+    db: sqlite3.Connection = Depends(get_db)
+):
+    try:
+        downloads = db.execute('''
+            SELECT id, video_url, audio_file_path, 
+                   transcript_file_path, download_time 
+            FROM content_downloads 
+            ORDER BY download_time DESC
+        ''').fetchall()
+        
+        return templates.TemplateResponse("downloads.html", {
+            "request": request,
+            "downloads": [dict(row) for row in downloads]
+        })
+    except sqlite3.Error as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-app.add_middleware(
-        CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+@app.post("/channels")
+async def create_channel(
+    channel: ChannelCreate,
+    db: sqlite3.Connection = Depends(get_db)
+):
+    try:
+        db.execute('''
+            INSERT INTO channels (channel_url, channel_type)
+            VALUES (?, ?)
+        ''', (channel.channel_url, channel.channel_type))
+        db.commit()
+        return RedirectResponse(url="/", status_code=303)
+    except sqlite3.IntegrityError:
+        raise HTTPException(400, "Channel already exists")
+    except sqlite3.Error as e:
+        raise HTTPException(500, str(e))
 
-bs = BackendService()
-
-
-@app.get("/")
-def read_root():
-    msg = "Hello, This is WiseFlow Backend."
-    return {"msg": msg}
-
-
-@app.post("/translations")
-def translate_all_articles(request: TranslateRequest):
-    return bs.translate(request.article_ids)
-
-
-@app.post("/search_for_insight")
-def add_article_from_insight(request: ReportRequest):
-    return bs.more_search(request.insight_id)
-
-
-@app.post("/report")
-def report(request: ReportRequest):
-    return bs.report(request.insight_id, request.toc, request.comment)
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
