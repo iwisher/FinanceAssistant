@@ -1,5 +1,9 @@
 import re
 import random
+
+import torch
+import whisper
+from whisper import Whisper
   
 def extract_video_info(text):
     """
@@ -86,7 +90,21 @@ def extract_video_info(text):
         "hours": hours,
         "minutes": minutes,
     }
-        
+
+GLOBAL_WHISPER = None
+
+def get_whisper()-> Whisper:
+    global GLOBAL_WHISPER
+    if GLOBAL_WHISPER is None:
+        device = torch.device(
+            'cuda') if torch.cuda.is_available() else torch.device('cpu')
+        GLOBAL_WHISPER = whisper.load_model("turbo", device=device)
+    
+    # turbo is the bestter balance between speed and accuracy
+    print("Whisper model loaded.")
+    
+    return    GLOBAL_WHISPER 
+
     
 if __name__ == '__main__':
     # Test the function

@@ -9,6 +9,7 @@ import json
 import whisper
 import torch
 from core.utils.db import create_connection, create_table , save_download_log
+from core.utils.utils import get_whisper
 
 # Configure logger
 logger.add(
@@ -31,11 +32,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
     create_table(conn)
 
     # load whisper model
-    # You can choose different models like "small", "medium", "large" for different accuracy/speed tradeoffs
-    device = torch.device(
-        'cuda') if torch.cuda.is_available() else torch.device('cpu')
-    whsiper_model = whisper.load_model("turbo", device=device)
-    print("Whisper model loaded.")
+    whsiper_model = get_whisper()
 
     try:
         timestamp = datetime.now().strftime("%Y%m%d-%H%M")
