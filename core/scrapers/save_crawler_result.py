@@ -1,15 +1,17 @@
+import sys, os
+sys.path.insert(0, os.path.abspath("./"))
+
 import asyncio
-import sqlite3
-import os
 from datetime import datetime
 import yt_dlp
 from loguru import logger
 from youtube_crawler import download_youtube_audio, extract_youtube_handle, youtube_crawler
 import json
-import whisper
-import torch
+
+
 from core.utils.db import create_connection, create_table , save_download_log
 from core.utils.utils import get_whisper
+
 
 # Configure logger
 logger.add(
@@ -36,9 +38,12 @@ async def download_playlist(playlist_url, download_dir='./download'):
 
     try:
         timestamp = datetime.now().strftime("%Y%m%d-%H%M")
+        # opts link
+        # https://github.com/yt-dlp/yt-dlp/blob/03c3d705778c07739e0034b51490877cffdc0983/yt_dlp/YoutubeDL.py#L187
         ydl_opts = {
             'noplaylist': False,
             'download_archive': os.path.join(download_dir, 'download_archive.log'),
+            'playlistend': 300, 
             'outtmpl': os.path.join(download_dir, '%(id)s.%(ext)s'),
             'format': 'bestaudio/best[acodec=mp3]',
             'embedthumbnail': True,

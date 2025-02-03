@@ -1,5 +1,5 @@
-from .mp_crawler import mp_crawler
-from .youtube_crawler import youtube_crawler
+from core.scrapers.mp_crawler import mp_crawler
+from core.scrapers.youtube_crawler import youtube_crawler
 #from .youtbue_podcast_crawler import applepodcast_crawler
 #from .gemini_parse_audio import gemini_chat
 #from .youtube_crawler import download_youtube_audio, extract_youtube_handle

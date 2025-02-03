@@ -4,8 +4,9 @@ import os
 from whisper import Whisper
 
 import sys
-# PROJECT_ROOT = "/models/DevSpace/FinanceAssistant"
-# sys.path.insert(0, PROJECT_ROOT)
+
+import os
+sys.path.insert(0, os.path.abspath("./"))
 
 from core.utils.db import create_connection, create_table, run_fetch, update_table
 from core.utils.utils import get_whisper
