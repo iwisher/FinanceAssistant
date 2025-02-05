@@ -49,11 +49,17 @@ if __name__ == '__main__':
     rows = run_fetch(conn, sql, ("https://www.youtube.com/@MeiTouJun/videos",))
 
     for entry in rows:
+        """
+        # Get the whsiper mode from my laptop
         transcript = get_whisper_transcript(entry['audio_file_path'], whisper_model)
 
         with open(file=os.path.abspath(entry['transcript_file_path']), mode='w', encoding='utf-8') as file:
             file.write(transcript)
             file.close()
+        """
+
+        with open(file=os.path.abspath(entry['transcript_file_path']), mode='r', encoding='utf-8') as file:
+             transcript = file.read()
 
         update_transcript(conn, entry['id'], transcript, entry['upload_time'])
 

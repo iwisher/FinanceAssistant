@@ -5,7 +5,7 @@ import asyncio
 from datetime import datetime
 import yt_dlp
 from loguru import logger
-from youtube_crawler import download_youtube_audio, extract_youtube_handle, youtube_crawler
+#from youtube_crawler import download_youtube_audio, extract_youtube_handle, youtube_crawler
 import json
 
 
@@ -44,6 +44,7 @@ async def download_playlist(playlist_url, download_dir='./download'):
             'noplaylist': False,
             'download_archive': os.path.join(download_dir, 'download_archive.log'),
             'playlistend': 300, 
+            #'break_on_existing': True,
             'outtmpl': os.path.join(download_dir, '%(id)s.%(ext)s'),
             'format': 'bestaudio/best[acodec=mp3]',
             'embedthumbnail': True,
