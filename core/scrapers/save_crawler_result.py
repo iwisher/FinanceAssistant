@@ -3,7 +3,23 @@ import os
 
 sys.path.insert(0, os.path.abspath("./"))
 
+<<<<<<< Updated upstream
+<<<<<<< HEAD
 from core.utils.db import create_connection, create_table, save_download_log,extract_metadata
+=======
+import asyncio
+from datetime import datetime
+import yt_dlp
+from loguru import logger
+#from youtube_crawler import download_youtube_audio, extract_youtube_handle, youtube_crawler
+import json
+
+
+from core.utils.db import create_connection, create_table , save_download_log
+>>>>>>> eef518b (download meitoupro)
+=======
+from core.utils.db import create_connection, create_table, save_download_log,extract_metadata
+>>>>>>> Stashed changes
 from core.utils.utils import get_whisper
 from loguru import logger
 import yt_dlp
