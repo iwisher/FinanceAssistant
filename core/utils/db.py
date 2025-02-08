@@ -1,5 +1,7 @@
+from datetime import datetime
 import sqlite3
 from loguru import logger
+import json
 
 
 def create_connection():
@@ -47,7 +49,7 @@ def create_table(conn):
         logger.error(f"Error creating table: {e}")
 
 
-def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data):
+def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data, original_time):
     """Save the youtube download log to the database.
 
     Args:
@@ -63,10 +65,12 @@ def save_download_log(conn, channel_url, video_url, audio_file_path, transcript_
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO content_downloads (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, metadata)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO content_downloads (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, metadata,
+                    original_timestamp) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             """,
-            (channel_url, video_url, audio_file_path, transcript_file_path, transcript_text, meta_data),
+            (channel_url, video_url, audio_file_path,
+             transcript_file_path, transcript_text, meta_data, original_time),
         )
         conn.commit()
         logger.info(f"Successfully saved download log for video: {video_url}")
@@ -92,21 +96,56 @@ def run_fetch(conn: sqlite3.Connection, query: str, params: tuple):
         rows = cursor.fetchall()
         # conn.commit() # No commit needed for SELECT queries
         logger.debug(f"Successfully fetched data for query: {query}")
-        return  [dict(row) for row in rows]
+        return [dict(row) for row in rows]
     except sqlite3.Error as e:
         logger.error(f"Error fetching data: {e}")
         return None
 
-# update db 
-def update_table(conn:sqlite3.Connection, query: str, params: tuple):
+# update db
+
+
+def update_table(conn: sqlite3.Connection, query: str, params: tuple):
     try:
         cursor = conn.cursor()
         cursor.execute(query, params)
         conn.commit()
-        #conn.close()
+        # conn.close()
     except sqlite3.Error as e:
         print(f"Database error: {e}")
     except Exception as e:
         print(f"General error: {e}")
 
 
+def extract_metadata(ydl, entry):
+    # Download each video individually
+    d_info = ydl.extract_info(
+        entry['webpage_url'], download=True)
+    # entry['title']
+    logger.info(f"Downloaded Title: {entry['title']}")
+    logger.info(f"Video Tags: {entry['tags']}")
+    logger.info(f"Video Categories: {entry['categories']}")
+    logger.info(
+        f"Video Descriptions: {entry['description']}")
+    logger.info(f"Video Channel ID: {entry['channel_id']}")
+    logger.info(f"Video Original Timestamp: {entry['timestamp']}")
+
+    # json_string = json.dumps(
+    #                          ydl.sanitize_info(d_info), indent=3)
+    # yt_metadata = json.loads(json_string)
+
+    # yt_metadata is a dictionary
+    yt_metadata = ydl.sanitize_info(d_info)
+    if "formats" in yt_metadata:
+        del yt_metadata["formats"]
+
+    if "automatic_captions" in yt_metadata:
+        del yt_metadata["automatic_captions"]
+
+    if "thumbnails" in yt_metadata:
+        del yt_metadata["thumbnails"]
+
+    json_string = json.dumps(yt_metadata, indent=3)
+
+    original_time = datetime.fromtimestamp(entry['timestamp'])
+
+    return json_string, original_time

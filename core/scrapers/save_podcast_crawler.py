@@ -1,30 +1,23 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
 
-import json
+sys.path.insert(0, os.path.abspath("./"))
+
+
+
 from typing import Union
 import httpx
 from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
-import pytz
-import re
 import asyncio
 from loguru import logger
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+
 import os
-import torch
-import whisper
 import yt_dlp
-import unicodedata
-import random
-import string
-from gemini_parse_audio import gemini_chat
 from save_crawler_result import save_download_log, create_connection
-from core.utils.utils import extract_video_info, get_whisper
+from core.utils.utils import get_whisper
+from core.utils.db import create_connection, create_table, save_download_log, extract_metadata
 
 
 # Configure logger
@@ -129,6 +122,7 @@ async def download_podcast(url, download_dir='./download'):
         'noplaylist': False,
         'extractaudio': True,       # Only extract audio
         'download_archive': os.path.join(download_dir, 'podcast_download_archive.log'),
+        'playlistend': 300,
         # Prioritize MP3 audio if availables
         'format': 'bestaudio/best[acodec=mp3]',
         'writethumbnail': False,
@@ -166,29 +160,11 @@ async def download_podcast(url, download_dir='./download'):
                     continue
 
                 logger.info(
-                    f"Downloading video {i+1} of {total_podcast}: {entry['title']}")
-                # Download each podcast individually
-                d_info = ydl.extract_info(entry['webpage_url'], download=True)
-                # entry['title']
-                logger.info(f"Downloaded Title: {entry['title']}")
-                logger.info(f"Video Tags: {entry['tags']}")
-                logger.info(f"Video Categories: {entry['categories']}")
-                logger.info(
-                    f"Video Descriptions: {entry['description']}")
-                logger.info(f"Video Channel ID: {entry['channel_id']}")
+                    f"Downloading video {i+1} of {len(entries)}: {entry['title']}")
 
-                metadata = {
-                    "id": entry['id'],
-                    "title": entry['title'],
-                    "tags": str(entry['tags']),
-                    "categories": str(entry['categories']),
-                    "descriptions": str(entry['description']),
-                    "channel_id": entry['channel_id'],
-                }
-
-                # json_string = json.dumps(metadata, indent=4)
-
-                json_string = json.dumps(ydl.sanitize_info(d_info), indent=3)
+                json_string, original_time = extract_metadata(
+                    ydl, entry)
+                
 
                 audio_file_path = os.path.join(
                     download_dir, f"{entry['id']}.mp3")
@@ -206,7 +182,7 @@ async def download_podcast(url, download_dir='./download'):
                 conn = create_connection()
 
                 save_download_log(
-                    conn, url, entry['webpage_url'], audio_file_path, transcript_file_path, transcript, json_string)
+                    conn, url, entry['webpage_url'], audio_file_path, transcript_file_path, transcript, json_string, original_time)
                 logger.info(
                     f"Successfully processed youtube video: {entry['webpage_url']}")
 
