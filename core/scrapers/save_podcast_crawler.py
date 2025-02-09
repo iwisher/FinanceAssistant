@@ -199,6 +199,8 @@ async def download_podcast(url, download_dir='./download'):
 if __name__ == '__main__':
 
     url = "https://www.youtube.com/playlist?list=PLoYXhWL_Ra8VTl7OvaH1imyfBletgmz0L"
+    # Yahoo stocks in translation
+    url = "https://www.youtube.com/playlist?list=PLx28zU8ctIRr6cdseGsQLidX7r0Jq44td"
     # channel_name = 'bloomberg-surveillance'
 
     async def main():
